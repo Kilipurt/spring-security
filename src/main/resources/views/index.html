@@ -1,0 +1,180 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Find me</title>
+</head>
+<body>
+
+<h1 class="title">Welcome to Find me!</h1>
+
+<div class="left">
+    <form id="login-form">
+        <p>Login</p>
+        <input id="phone" name="phone" type="text" required>
+
+        <p>Password</p>
+        <input id="password" name="password" type="text" required>
+
+        <p>
+            <button type="submit">Login</button>
+        </p>
+    </form>
+
+    <button id="registration-button" onclick="displayRegistrationForm()">Registration</button>
+</div>
+
+<div class="right">
+    <form id="registration-form">
+        <div class="form-fields-wrap">
+            <div class="left-form-side">
+                <p>*First name:</p>
+                <input type="text" name="firstName" required>
+
+                <p>*Last name:</p>
+                <input type="text" name="lastName" required>
+
+                <p>*Phone</p>
+                <input type="text" name="phone" required>
+
+                <p>*Password</p>
+                <input type="text" name="password" required>
+
+                <p>*Country:</p>
+                <input type="text" name="country" required>
+
+                <p>*City:</p>
+                <input type="text" name="city" required>
+            </div>
+
+            <div class="right-form-side">
+                <p>*Age:</p>
+                <input type="number" name="age" required>
+
+                <p>Relationship status:</p>
+                <input type="text" name="relationshipStatus">
+
+                <p>Religion:</p>
+                <input type="text" name="religion">
+
+                <p>School:</p>
+                <input type="text" name="school">
+
+                <p>University:</p>
+                <input type="text" name="university">
+            </div>
+        </div>
+
+        <div class="submit-form">
+            <p>Fields, that was marked as *, are required</p>
+
+            <button type="submit">Register</button>
+
+            <button onclick="hideRegistrationForm()">Cancel</button>
+        </div>
+    </form>
+
+    <div id="info" class="info">Some info</div>
+</div>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+</body>
+
+<script>
+    $(document).ready(function () {
+        document.getElementById('registration-form').style.display = 'none';
+    });
+
+    function displayRegistrationForm() {
+        document.getElementById('registration-form').style.display = 'block';
+        document.getElementById('registration-button').style.display = 'none';
+    }
+
+    function hideRegistrationForm() {
+        document.getElementById('registration-form').style.display = 'none';
+        document.getElementById('registration-button').style.display = 'block';
+    }
+
+    $("#registration-form").on('submit', function () {
+        document.getElementById('registration-form').style.display = 'none';
+        document.getElementById('info').style.display = 'block';
+        document.getElementById('registration-button').style.display = 'block';
+
+        $.ajax({
+            url: "/user-registration",
+            type: "POST",
+            data: $('#registration-form').serialize(),
+            error: function error(xhr) {
+                alert(xhr.responseText);
+            }
+        });
+        return false;
+    });
+
+    $('#login-form').on('submit', function () {
+        $.ajax({
+            url: "/login",
+            type: "GET",
+            data: {
+                phone: document.getElementById("phone").value,
+                password: document.getElementById("password").value
+            },
+            success: function success(xhr) {
+                localStorage.setItem('loggedInUser', xhr);
+                window.location.replace("/user/" + JSON.parse(xhr).id);
+            },
+            error: function error(xhr) {
+                alert(xhr.responseText);
+            }
+        });
+        return false;
+    });
+</script>
+
+<style>
+    body {
+        background-color: honeydew;
+    }
+
+    .left {
+        background-color: lightblue;
+        border: 2px solid cornflowerblue;
+        border-radius: 30px;
+        float: left;
+        margin: 20px;
+        padding: 20px;
+        position: absolute;
+        left: 100px;
+    }
+
+    .right {
+        overflow: auto;
+        margin: 20px;
+        padding: 20px;
+        position: absolute;
+        left: 400px;
+        background-color: lightblue;
+        border: 2px solid cornflowerblue;
+        border-radius: 30px;
+    }
+
+    .left-form-side {
+        float: left;
+        padding-right: 100px;
+    }
+
+    .right-form-side {
+        overflow: auto;
+        margin: 20px;
+    }
+
+    .submit-form {
+        padding-top: 50px;
+    }
+
+    .title, .header {
+        text-align: center;
+    }
+</style>
+
+</html>

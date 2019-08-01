@@ -1,0 +1,462 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Find me</title>
+</head>
+<body>
+<div class="menu">
+    <a href="#" id="my-profile-btn">My profile</a>
+    <br>
+
+    <a href="#" id="get-feed-btn">News</a>
+    <br>
+
+    <a href="#" id="get-chats-btn">Chats</a>
+    <br>
+
+    <hr>
+    <a href="#" id="logout-btn">Logout</a>
+</div>
+
+<div class="user-info">
+    <div class="left">
+        <div class="photo">Photo</div>
+
+        <div class="relationship-status" id="relationship-status">
+            <p id="status-field"></p>
+        </div>
+
+        <p>
+            <button id="send-friend-request-btn" type="submit">Add to friends</button>
+        </p>
+
+        <p>
+            <button id="send-message-form-display-btn" onclick="displaySendMessageForm()">Sent message</button>
+        </p>
+
+        <form id="send-message-form">
+            <p>Text:</p>
+            <input id="text" type="text" name="text"/>
+            <button type="submit">Send Message</button>
+        </form>
+        <button id="hide-send-message-form-btn" onclick="hideSendMessageForm()">Cancel</button>
+    </div>
+
+    <div class="right">
+        <p class="userId" id="userId" th:text="${user.id}"></p>
+        <p class="userFirstName" id="userFirstName" th:text="${user.firstName}"></p>
+        <p class="userLastName" id="userLastName" th:text="${user.lastName}"></p>
+        <p class="userPhone" id="userPhone" th:text="${user.phone}"></p>
+        <p class="userCountry" id="userCountry" th:text="${user.country}"></p>
+        <p class="userCity" id="userCity" th:text="${user.city}"></p>
+        <p class="userAge" id="userAge" th:text="${user.age}"></p>
+        <p class="userDateRegistered" id="userDateRegistered" th:text="${user.dateRegistered}"></p>
+        <p class="userDateLastActive" id="userDateLastActive" th:text="${user.dateLastActive}"></p>
+        <p class="userRelationshipStatus" id="userRelationshipStatus" th:text="${user.relationshipStatus}"></p>
+        <p class="userReligion" id="userReligion" th:text="${user.religion}"></p>
+        <p class="userSchool" id="userSchool" th:text="${user.school}"></p>
+        <p class="userUniversity" id="userUniversity" th:text="${user.university}"></p>
+
+        <div th:each="role : ${user.roles}">
+            <p th:text="${role.name}"></p>
+        </div>
+
+        <hr>
+
+        <div class="requests">
+            <div class="income-requests" id="income-requests">
+                <h4>Income Requests</h4>
+            </div>
+
+            <div class="outcome-requests" id="outcome-requests">
+                <h4>Outcome Requests</h4>
+            </div>
+        </div>
+    </div>
+
+    <hr>
+
+    <div class="posts">
+        <div class="create-post-div">
+            <button id="display-post-form-btn" onclick="displayPostForm()">New post</button>
+
+            <form id="post-form">
+                <p>Text</p>
+                <input id="post-message" name="post-message" type="text"/>
+
+                <form id="tagged-users-form">
+                    <p>Tagged users</p>
+
+                    <input id="tagged-users-input" list="taggedUsers" name="taggedUsers"
+                    <!--oninput="getFriendsByPattern()"-->>
+                    <datalist id="taggedUsers">
+                        <th:block th:each="friend : ${friends}">
+                            <option th:value="${friend.firstName} ${friend.lastName}"></option>
+                        </th:block>
+                    </datalist>
+
+                    <button type="submit">Tag</button>
+                </form>
+
+                <p>Location</p>
+                <input id="location" name="location" type="text"/>
+
+                <button type="submit">Create</button>
+            </form>
+
+            <button id="hide-post-form-btn" onclick="hidePostForm()">Cancel</button>
+        </div>
+    </div>
+</div>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+</body>
+
+<style>
+    body {
+        background-color: honeydew;
+    }
+
+    a {
+        font-weight: 700;
+        text-decoration: none;
+        border-radius: 3px;
+        background: inherit;
+        transition: 0.2s;
+        margin: 5px;
+    }
+
+    a:hover {
+        background: honeydew;
+    }
+
+    .menu {
+        background-color: lightblue;
+        border: 2px solid cornflowerblue;
+        border-radius: 30px;
+        float: left;
+        padding: 20px;
+        margin: 40px 20px 20px 20px;
+        position: absolute;
+        left: 100px;
+        height: auto;
+    }
+
+    .menu ul {
+        list-style: none;
+    }
+
+    .menu ul li button {
+        display: block;
+        margin-top: 3px;
+        padding-left: 5px;
+        padding-top: 4px;
+        padding-bottom: 4px;
+    }
+
+    .photo {
+        text-align: center;
+        width: 200px;
+        height: 300px;
+        border-style: solid;
+    }
+
+    .user-info {
+        border: 2px solid cornflowerblue;
+        border-radius: 30px;
+        position: absolute;
+        left: 250px;
+        margin: 20px;
+    }
+
+    .right {
+        margin: 20px;
+        padding: 20px;
+    }
+
+    .left {
+        background-color: lightblue;
+        border: 2px solid cornflowerblue;
+        border-radius: 30px;
+        float: left;
+        padding: 20px;
+        margin: 20px 50px 20px 20px;
+    }
+
+    .right {
+        background-color: lightblue;
+        border: 2px solid cornflowerblue;
+        border-radius: 30px;
+        overflow: auto;
+        margin: 20px;
+    }
+
+    .userId, .loginUserId {
+        display: none;
+    }
+</style>
+
+<script th:inline="javascript">
+    var loggedInUser = JSON.parse(localStorage.getItem('loggedInUser'));
+
+    // $(document).ready(function () {
+    //     if (loggedInUser == null) {
+    //         loggedInUser = [[${user}]];
+    //         localStorage.setItem('user', JSON.stringify(loggedInUser));
+    //     }
+    // });
+
+    $(document).ready(function getRelationshipStatus() {
+        $.ajax({
+            url: "/get-relationship",
+            type: "GET",
+            data: {
+                userId: $('#userId').text()
+            },
+            success: function (xhr) {
+                var relationship = JSON.parse(xhr);
+                $('#status-field').text(relationship.status);
+            }
+        });
+
+        return false;
+    });
+
+    $(document).ready(function () {
+        hidePostForm();
+        hideSendMessageForm();
+
+        if ($('#userId').text() == loggedInUser.id) {
+            document.getElementById("send-friend-request-btn").style.display = 'none';
+            document.getElementById('hide-send-message-form-btn').style.display = 'none';
+            document.getElementById("relationship-status").style.display = 'none';
+            document.getElementById('send-message-form-display-btn').style.display = 'none';
+        } else {
+            document.getElementById("income-requests").style.display = 'none';
+            document.getElementById("outcome-requests").style.display = 'none';
+        }
+
+        if ($('#status-field').text() == 'FRIENDS') {
+            document.getElementById('send-friend-request-btn').style.display = 'none';
+        }
+    });
+
+    function displayPostForm() {
+        document.getElementById('post-form').style.display = 'block';
+        document.getElementById('hide-post-form-btn').style.display = 'block';
+        document.getElementById('display-post-form-btn').style.display = 'none';
+    }
+
+    function hidePostForm() {
+        document.getElementById('post-form').style.display = 'none';
+        document.getElementById('hide-post-form-btn').style.display = 'none';
+        document.getElementById('display-post-form-btn').style.display = 'block';
+    }
+
+    function displaySendMessageForm() {
+        document.getElementById('send-message-form-display-btn').style.display = 'none';
+        document.getElementById('send-message-form').style.display = 'block';
+        document.getElementById('hide-send-message-form-btn').style.display = 'block';
+    }
+
+    function hideSendMessageForm() {
+        document.getElementById('send-message-form').style.display = 'none';
+        document.getElementById('hide-send-message-form-btn').style.display = 'none';
+        document.getElementById('send-message-form-display-btn').style.display = 'block';
+    }
+
+    $('#get-chats-btn').on('click', function getChats() {
+        window.location.replace("/chats/" + loggedInUser.id);
+    });
+
+    $('#get-feed-btn').on('click', function getFeed() {
+        window.location.replace("/feed/" + loggedInUser.id);
+    });
+
+    $('#my-profile-btn').on('click', function getProfile() {
+        window.location.replace('/user/' + loggedInUser.id);
+    });
+
+    $('#logout-btn').on('click', function logout () {
+        $.ajax({
+            url: "/logout",
+            type: "GET",
+            success: function success() {
+                loggedInUser = null;
+                localStorage.removeItem('loggedInUser');
+                window.location.replace("/");
+            },
+            error: function error(xhr) {
+                alert(xhr.responseText);
+            }
+        });
+
+        return false;
+    });
+
+    $('#send-message-form').on('submit', function (e) {
+        var userTo = [[${user}]];
+
+        var message = {
+            text: document.getElementById('text').value,
+            userTo: userTo,
+            userFrom: loggedInUser
+        };
+
+        $.ajax({
+            url: "/send-message",
+            type: "POST",
+            data: JSON.stringify(message),
+            dataType: "json",
+            contentType: "application/json",
+            success: function success() {
+                hideSendMessageForm();
+                alert("Message sent successfully");
+            },
+            error: function error(xhr) {
+                alert(xhr.responseText);
+            }
+        });
+
+        return false;
+    });
+
+    $(document).ready(function () {
+        if ($('#userId').text() == loggedInUser.id) {
+            $.ajax({
+                url: "/income-requests",
+                type: "GET",
+                success: function success(xhr) {
+                    var incomeRequestsDiv = document.getElementById("income-requests");
+                    var users = JSON.parse(xhr.toString());
+                    for (var i = 0; i < users.length; i++) {
+                        var aloneRequestDiv = document.createElement("div");
+                        aloneRequestDiv.innerHTML = users[i].id + " "
+                            + users[i].firstName + " "
+                            + users[i].lastName + " ";
+                        var denyButton = document.createElement("button");
+                        denyButton.innerHTML = "Deny request";
+                        denyButton.id = "denyButton" + users[i].id;
+                        denyButton.addEventListener("click", denyRequest);
+                        aloneRequestDiv.insertAdjacentElement("beforeEnd", denyButton);
+                        var acceptButton = document.createElement("button");
+                        acceptButton.innerHTML = "Accept request";
+                        acceptButton.id = "acceptButton" + users[i].id;
+                        acceptButton.addEventListener("click", acceptRequest);
+                        aloneRequestDiv.insertAdjacentElement("beforeEnd", acceptButton);
+                        incomeRequestsDiv.insertAdjacentElement("beforeEnd", aloneRequestDiv);
+                    }
+                },
+                error: function error(xhr) {
+                    alert(xhr.responseText);
+                }
+            });
+        }
+        return false;
+    });
+
+    $(document).ready(function () {
+        if ($('#userId').text() == loggedInUser.id) {
+            $.ajax({
+                url: "/outcome-requests",
+                type: "GET",
+                success: function success(xhr) {
+                    var outcomeRequestsDiv = document.getElementById("outcome-requests");
+                    var users = JSON.parse(xhr.toString());
+                    for (var i = 0; i < users.length; i++) {
+                        var aloneRequestDiv = document.createElement("div");
+                        aloneRequestDiv.innerHTML = users[i].id + " "
+                            + users[i].firstName + " "
+                            + users[i].lastName + " ";
+                        var cancelButton = document.createElement("button");
+                        cancelButton.innerHTML = "Cancel request";
+                        cancelButton.id = "cancelButton" + users[i].id;
+                        cancelButton.addEventListener("click", cancelRequest);
+                        aloneRequestDiv.insertAdjacentElement("beforeEnd", cancelButton);
+                        outcomeRequestsDiv.insertAdjacentElement("beforeEnd", aloneRequestDiv);
+                    }
+                },
+                error: function error(xhr) {
+                    alert(xhr.responseText);
+                }
+            });
+        }
+        return false;
+    });
+
+    $('#send-friend-request-btn').on("click", function () {
+        if ($('#status-field').text() == 'Not friends') {
+            $.ajax({
+                url: "/add-relationship",
+                type: "POST",
+                data: {
+                    userIdTo: $('#userId').text()
+                },
+                success: function success() {
+                    alert("Request sent successfully");
+                },
+                error: function error(xhr) {
+                    alert(xhr.responseText);
+                }
+            });
+            return false;
+        } else {
+            var url = "/update-relationship?userIdTo=" + $('#userId').text() + "&status=REQUEST_SENT";
+
+            updateRelationship(url);
+        }
+    });
+
+    function cancelRequest() {
+        updateRelationship("/update-relationship?&userIdTo=" + this.id.replace('cancelButton', '') + "&status=DELETED");
+    }
+
+    function denyRequest() {
+        updateRelationship("/update-relationship?userIdTo=" + this.id.replace('denyButton', '') + "&status=REQUEST_DECLINED");
+    }
+
+    function acceptRequest() {
+        updateRelationship("/update-relationship?userIdTo=" + this.id.replace('acceptButton', '') + "&status=FRIENDS");
+    }
+
+    function updateRelationship(url) {
+        $.ajax({
+            url: url,
+            type: 'PUT',
+            success: function success() {
+                alert("success");
+            },
+            error: function error(xhr) {
+                alert(xhr.responseText);
+            }
+        });
+
+        return false;
+    }
+
+    $("#post-form").on('submit', function () {
+        //TODO users tagged
+        var post = {
+            message: document.getElementById("post-message").value,
+            usersTagged: document.getElementById("taggedUsers").value,
+            userPosted: loggedInUser.id,
+            userPagePosted: $('#userId').text(),
+            location: document.getElementById("location").value
+        };
+
+        $.ajax({
+            url: "/add-post",
+            type: "POST",
+            data: JSON.stringify(post),
+            dataType: "json",
+            contentType: "application/json",
+            error: function error(xhr) {
+                alert(xhr.responseText);
+            }
+        });
+
+        return false;
+    });
+</script>
+</html>
