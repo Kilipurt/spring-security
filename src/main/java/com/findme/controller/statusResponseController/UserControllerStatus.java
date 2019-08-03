@@ -7,7 +7,6 @@ import lombok.extern.log4j.Log4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpSession;
@@ -40,16 +39,16 @@ public class UserControllerStatus {
         return new ResponseEntity<>("Registration is success", HttpStatus.OK);
     }
 
-    @RequestMapping(path = "/login", method = RequestMethod.GET)
-    public ResponseEntity<String> login(HttpSession session, @RequestParam String phone, @RequestParam String password)
-            throws Exception {
-        log.info("UserController login method.");
-
-        User user = userService.login(phone, password);
-        session.setAttribute("user", user);
-
-        return new ResponseEntity<>(jsonUtil.toJson(user), HttpStatus.OK);
-    }
+//    @RequestMapping(path = "/login", method = RequestMethod.GET)
+//    public ResponseEntity<String> login(HttpSession session, @RequestParam String username, @RequestParam String password)
+//            throws Exception {
+//        log.info("UserController login method.");
+//
+//        User user = userService.login(username, password);
+//        session.setAttribute("user", user);
+//
+//        return new ResponseEntity<>(jsonUtil.toJson(user), HttpStatus.OK);
+//    }
 
     @RequestMapping(path = "/logout", method = RequestMethod.GET)
     public ResponseEntity<String> logout(HttpSession session) throws Exception {

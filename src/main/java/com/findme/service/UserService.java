@@ -81,13 +81,13 @@ public class UserService implements UserDetailsService {
     }
 
     public User login(String phone, String password) throws InternalServerError, BadRequestException {
-        log.info("UserService login method. Login user with phone " + phone);
+        log.info("UserService login method. Login user with username " + phone);
 
         User user = userDAO.getUserByPhone(phone);
 
         if (user == null) {
-            log.error("UserService login method. User with phone " + phone + " was not found");
-            throw new BadRequestException("User with phone " + phone + " was not found");
+            log.error("UserService login method. User with username " + phone + " was not found");
+            throw new BadRequestException("User with username " + phone + " was not found");
         }
 
         if (!user.getPassword().equals(password)) {
@@ -129,8 +129,8 @@ public class UserService implements UserDetailsService {
         log.info("UserService validateUser method. User validating");
 
         if (userDAO.getUserByPhone(user.getPhone()) != null) {
-            log.error("UserService validateUser method. User with phone " + user.getPhone() + " already registered");
-            throw new BadRequestException("User with phone " + user.getPhone() + " already registered");
+            log.error("UserService validateUser method. User with username " + user.getPhone() + " already registered");
+            throw new BadRequestException("User with username " + user.getPhone() + " already registered");
         }
 
         if (user.getFirstName().isEmpty()) {

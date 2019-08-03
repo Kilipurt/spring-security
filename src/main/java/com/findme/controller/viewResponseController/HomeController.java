@@ -14,4 +14,10 @@ public class HomeController {
         log.info("HomeController home method.");
         return "index";
     }
+
+    @RequestMapping(path = "/home", method = RequestMethod.GET)
+    public String home1() {
+        log.info("HomeController home method.");
+        return "home";
+    }
 }

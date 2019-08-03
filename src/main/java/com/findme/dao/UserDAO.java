@@ -33,7 +33,7 @@ public class UserDAO extends GeneralDAO<User> {
     }
 
     public User getUserByPhone(String phone) throws InternalServerError {
-        log.info("UserDAO getUserByPhone method. Selecting user by phone " + phone);
+        log.info("UserDAO getUserByPhone method. Selecting user by username " + phone);
         try {
             Query query = getEntityManager().createNativeQuery(GET_USER_BY_PHONE, User.class);
             query.setParameter("phone", phone);
